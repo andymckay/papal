@@ -1,5 +1,8 @@
 from datetime import timedelta
-import json
+try:
+    import json
+except ImportError:
+    from django.utils import simplejson as json
 
 from django.conf import settings
 from django.core import serializers
