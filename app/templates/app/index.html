@@ -1,0 +1,108 @@
+<html>
+<title>Papal :: AMO Paypal Stats</title>
+<head>
+  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css" />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+  <script src="{{ STATIC_URL }}highcharts.js"></script>
+</head>
+<body>
+  <div class="container-fluid">
+    <h1>Papal :: AMO Paypal Stats</h1>
+    <section>
+    <form method="post">
+      <fieldset>
+        {{ form.as_bootstrap }}
+        <div class="clearfix">
+          <div class="input">
+            <input class="btn primary" type="submit" value="Search">
+          </div>
+        </div>
+      </fieldset>
+    </form>
+    {% if render %}
+    <div id="graph">
+    </div>
+    <div id="data" style="display: none" data-url="{% url data %}">
+      <table class="zebra-striped">
+        <thead>
+        <tr>
+          <th>Server</th>
+          <th>Level</th>
+          <th>Flag</th>
+          <th>Date</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    </div>
+    <script>
+      $(document).ready(function() {
+
+function format(string, args) {
+    for (var i = 0; i < args.length; i++) {
+        var reg = new RegExp('\\{' + i + '\\}', 'gm');
+        string = string.replace(reg, args[i]);
+    }
+    return string;
+}
+      function populate(category, name) {
+        var target = $('#data'),
+            server = $('#id_server').val();
+        target.show();
+        target.find('tbody').html('');
+        $.getJSON($('#data').attr('data-url') + format('?server={0}&date={1}&flag={2}', [server, category, name]), function(data) {
+          $.each(data, function(key, value) {
+            target.find('tbody').append(format('<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>',
+                                               [value.fields.server, value.fields.level, value.fields.flag,
+                                                value.fields.date, value.fields.data]));
+          });
+        });
+      };
+
+      var chart1 = new Highcharts.Chart({
+         chart: {
+            renderTo: 'graph',
+            type: 'line'
+         },
+         title: {
+            text: '{{ server }}'
+          },
+          xAxis: {
+            categories: [{{ dates|safe }}],
+          },
+          yAxis: {
+            title: { text: 'Count' },
+            min: 0,
+          },
+          plotOptions: {
+        series: {
+            cursor: 'pointer',
+            point: {
+                events: {
+                  click: function() {
+                        populate(this.category, this.series.name);
+                    }
+                }
+            }
+        }
+    },
+         series: [
+         {% for name, data in formatted.items %}
+         {
+            name: '{{ name }}',
+            data: {{ data }}
+        }{% if not forloop.last %},{% endif %}
+         {% endfor %}
+         ]
+      });
+    });
+  </script>
+
+    {% endif %}
+    <!-- {{ counts }} -->
+  </section>
+  </div>
+</body>
+</html>
