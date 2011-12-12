@@ -1,18 +1,18 @@
 from datetime import date
-import hashlib
+import md5
 import os
 import re
 
 raw_parsers = (
     ['Calling completed', 'ipn_completed'],
     ['Completed IPN received', 'ipn_completed_received'],
-    ['Contribution not found', 'ipn_fatal'],
-    ['IPN received', 'ipn_received'],
+    ['Contribution not found', 'not_found'],
+    ['IPN received', 'received'],
     ['Paypal Error', 'paypal_error'],
     ['HTTP Error', 'http_error'],
     ['<urlopen error The read operation timed out>', 'http_error'],
     ['\[\d+\] PayPal sent a transaction', 'ipn_fatal'],
-    ['\[\d+\] PayPal Data', 'ipn_fatal'],
+    ['\[\d+\] PayPal Data', 'ipn_started'],
     ['Completed successfully processed', 'ipn_complete'],
     ['Getting refund permission URL', 'refund_permission'],
     ['Refund successfully processed', 'ipn_refund_processed'],
@@ -32,17 +32,21 @@ raw_parsers = (
 prefix = '^(?P<level>INFO|WARNING|ERROR|DEBUG) '
 parsers = [(re.compile('%s%s' % (prefix, r)), m) for r, m in raw_parsers]
 
-from functools import partial
-
-def trunc(length, match):
+def trunc(match):
     item = match.group(0)
+    length = item.find('=') + 6
+    return item[:length] + ((len(item) - length) * '*')
+
+def trunc_all(match):
+    item = match.group(0)
+    length = item.find('=') + 1
     return item[:length] + ((len(item) - length) * '*')
 
 raw_scrubs = (
-    ['tracking_id=[a-f0-9]{32}', partial(trunc, 22)],
-    ['email=.*?&', partial(trunc, 6)],
-    ['pay_key=[A-Z0-9\-]+', partial(trunc, 20)],
-    ["'payer_email': u'.*?'", partial(trunc, 17)],
+    ['tracking_id=[a-f0-9]{32}', trunc],
+    ['email=.*?&', trunc_all],
+    ['pay_key=[A-Z0-9\-]+', trunc],
+    ["'payer_email': u'.*?'", trunc],
 )
 
 scrubs = [(re.compile(r), f) for r, f in raw_scrubs]
@@ -55,10 +59,10 @@ class Parser(object):
         self.filename = filename
 
     def process(self):
-        with open(self.filename) as fl:
-            lines = fl.read().split('\n')
-            for line in lines:
-                self.parse_line(line)
+        fl = open(self.filename)
+        lines = fl.read().split('\n')
+        for line in lines:
+            self.parse_line(line)
 
     def parse_line(self, line):
         try:
@@ -85,12 +89,12 @@ class Parser(object):
         return line
 
     def line_parser_default(self, flag, line, match):
-        md5 = hashlib.md5('%s.%s.%s' %
+        _md5 = md5.new('%s.%s.%s' %
                           (self.filename, flag, line)).hexdigest()
         try:
-            papal = PapalStats.objects.get(md5=md5)
+            papal = PapalStats.objects.get(md5=_md5)
         except PapalStats.DoesNotExist:
-            papal = PapalStats(md5=md5)
+            papal = PapalStats(md5=_md5)
         line = self.scrub_line(line)
         papal.flag = flag
         papal.data = line
@@ -101,7 +105,7 @@ class Parser(object):
         papal.save()
 
 if __name__=='__main__':
-    directory = '/Users/andy/paypal/'
+    directory = '/home/amckay/paypal/'
     for fl in os.listdir(directory):
         print 'Parsing: %s' % fl
         p = Parser(os.path.join(directory, fl))
