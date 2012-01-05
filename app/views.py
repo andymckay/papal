@@ -1,14 +1,11 @@
 from datetime import timedelta
-try:
-    import json
-except ImportError:
-    from django.utils import simplejson as json
 
 from django.conf import settings
 from django.core import serializers
 from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.template import Context, Template
 from django.views.decorators.csrf import csrf_exempt
 
 from app.forms import PapalForm, PapalDataForm
@@ -32,7 +29,7 @@ def format_dates(end, diff):
     return "'" + "','".join(dates) + "'"
 
 @csrf_exempt
-def home(request):
+def paypal(request):
     form = PapalForm(request.POST or None)
     counts = []
     data = {'render': False,
@@ -55,7 +52,7 @@ def home(request):
                      'dates': format_dates(end, (end - start).days + 1),
                     })
 
-    return render_to_response('app/index.html', data, mimetype='text/html')
+    return render_to_response('app/paypal.html', data, mimetype='text/html')
 
 def data(request):
     form = PapalDataForm(request.GET)
@@ -66,3 +63,70 @@ def data(request):
         json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
         return response
     return response
+
+def home(request):
+    return render_to_response('app/home.html', data, mimetype='text/html')
+
+def graphite(request):
+    site = request.GET.get('site', 'addons')
+    site_names = {
+        'addons': 'PHX',
+        'dev': 'Preview',
+        'stage': 'Stage',
+        'apps-preview': 'Apps Preview',
+        'apps-preview-dev': 'Apps Preview Dev'
+    }
+    site_urls = {
+        'addons': 'https://addons.mozilla.org',
+        'dev': 'https://addons-dev.allizom.org',
+        'stage': 'https://addons.allizom.org',
+        'apps-preview': 'https://apps-preview.mozilla.org',
+        'apps-preview-dev': 'https://apps-preview-dev.allizom.org'
+    }
+    sites = {
+        'addons': 'addons',
+        'dev': 'addons-dev',
+        'stage': 'addons-stage',
+        'apps-preview': 'addons-appspreview',
+        'apps-preview-dev': 'addons-appspreviewdev'
+    }
+    data = {
+        'base': 'https://graphite-phx.mozilla.org/render/?width=586&height=308',
+        'site_url': site_urls[site],
+        'site_urls': site_urls,
+        'site_name': site_names[site],
+        'site': sites[site],
+        'sites': sites,
+        'fifteen': 'from=-15minutes&title=15 minutes',
+        'hour': 'from=-1hours&title=1 hour',
+        'day': 'from=-24hours&title=24 hours',
+        'week': 'from=-7days&title=7 days',
+        'ns': 'stats.%s' % sites[site]
+    }
+    _graphs = (
+        ['All Responses', ['target=sumSeries({{ ns }}.response.*)&target={{ ns }}.response.200&target={{ ns }}.response.301&target={{ ns }}.response.302&target={{ ns }}.response.403&target={{ ns }}.response.404&target={{ ns }}.response.405&target={{ ns }}.response.500']],
+        ['Site performance', ['target=stats.timers.{{ site }}.view.GET.lower&target=stats.timers.{{ site }}.view.GET.mean&target=stats.timers.{{ site }}.view.GET.upper_90']],
+        ['Redirects and Errors', ['target={{ ns }}.response.301&target={{ ns }}.response.302&target={{ ns }}.response.304&target={{ ns }}.response.400&target={{ ns }}.response.403&target={{ ns }}.response.404&target={{ ns }}.response.405&target={{ ns }}.response.500&target={{ ns }}.response.503']],
+        ['Celery', ['target=sumSeries({{ site }}.celery.tasks.pending.*.*.*)&target=nonNegativeDerivative(sumSeries({{ site }}.celery.tasks.total.*.*.*))&target=nonNegativeDerivative(sumSeries({{ site }}.celery.tasks.failed.*.*.*))']],
+        ['Validation', ['target=stats.timers.{{ site }}.devhub.validator.lower&target=stats.timers.{{ site }}.devhub.validator.mean&target=stats.timers.{{ site }}.devhub.validator.upper_90']],
+        ['GUID Search', ['target=stats.timers.{{ site }}.view.api.views.guid_search.GET.lower&target=stats.timers.{{ site }}.view.api.views.guid_search.GET.mean&target=stats.timers.{{ site }}.view.api.views.guid_search.GET.upper_90&target=scale(stats.timers.{{ site }}.view.api.views.guid_search.GET.count(0.01)']],
+        ['Update', ['target=stats.timers.{{ site }}.services.update.lower&target=stats.timers.{{ site }}.services.update.mean&target=stats.timers.{{ site }}.services.update.upper_90&target=scale(stats.timers.{{ site }}.services.update.count(0.01)']],
+        ['Verify', ['target=stats.timers.{{ site }}.services.verify.lower&target=stats.timers.{{ site }}.services.verify.mean&target=stats.timers.{{ site }}.services.verify.upper_90&target=scale(stats.timers.{{ site }}.services.verify.count(0.01)']],
+        ['Homepage', ['target=stats.timers.{{ site }}.view.addons.views.home.GET.lower&target=stats.timers.{{ site }}.view.addons.views.home.GET.mean&target=stats.timers.{{ site }}.view.addons.views.home.GET.upper_90&target=scale(stats.timers.{{ site }}.view.addons.views.home.GET.count,0.1)']],
+        ['Search', ['target=stats.timers.{{ site }}.view.search.views.search.GET.lower&target=stats.timers.{{ site }}.view.search.views.search.GET.mean&target=stats.timers.{{ site }}.view.search.views.search.GET.upper_90&target=scale(stats.timers.{{ site }}.view.search.views.search.GET.count,0.1)']],
+        ['ES Request', ['target=stats.timers.{{ site }}.search.es.took.lower&target=stats.timers.{{ site }}.search.es.took.mean&target=stats.timers.{{ site }}.search.es.took.upper_90&target=scale(stats.timers.{{ site }}.search.es.took.count%2C0.1)']],
+        ['ES Internal', ['target=stats.timers.{{ site }}.search.es.took.lower&target=stats.timers.{{ site }}.search.es.took.mean&target=stats.timers.{{ site }}.search.es.took.upper_90&target=scale(stats.timers.{{ site }}.search.es.took.count%2C0.1)']],
+        ['Authenticated Responses', ['target=stats.{{ site }}.response.auth.200&target=scale(stats.{{ site }}.response.200%2C0.1)&from=-1hours']],
+        ['Marketplace', ['target=stats.timers.{{ site }}.paypal.paykey.retrieval.upper_90']],
+        ['Client', ['target=stats.timers.{{ site }}.window.performance.timing.domInteractive.mean&target=stats.timers.{{ site }}.window.performance.timing.domInteractive.upper_90&target=stats.timers.{{ site }}.window.performance.timing.domComplete.mean&target=stats.timers.{{ site }}.window.performance.timing.domComplete.upper_90&target=stats.timers.{{ site }}.window.performance.timing.domLoading.mean&target=stats.timers.{{ site }}.window.performance.timing.domLoading.upper_90']]
+    )
+
+    graphs = []
+    ctx = Context(data)
+    for name, gs in _graphs:
+        graphs.append([name.lower().replace(' ', '-'), name,
+                       [str(Template(g).render(ctx)) for g in gs]])
+
+    data['graphs'] = graphs
+    return render_to_response('app/graphite.html', data, mimetype='text/html')
+
