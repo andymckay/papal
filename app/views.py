@@ -124,10 +124,10 @@ def graphite(request):
                     '&target=stats.timers.{{ site }}.window.performance.timing.domLoading.mean'
                     '&target=stats.timers.{{ site }}.window.performance.timing.domLoading.upper_90']],
         ['Client Counts', ['target=stats.{{ site }}.window.performance.navigation.redirectCountstats'
-                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.back_forward'
-                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.navigate'
-                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.reload'
-                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.reserved']]
+                    '&target=stats.{{ site }}.window.performance.navigation.type.back_forward'
+                    '&target=stats.{{ site }}.window.performance.navigation.type.navigate'
+                    '&target=stats.{{ site }}.window.performance.navigation.type.reload'
+                    '&target=stats.{{ site }}.window.performance.navigation.type.reserved']]
     )
 
     graphs = []
