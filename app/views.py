@@ -117,7 +117,17 @@ def graphite(request):
         ['ES Request', ['target=stats.timers.{{ site }}.search.es.took.lower&target=stats.timers.{{ site }}.search.es.took.mean&target=stats.timers.{{ site }}.search.es.took.upper_90&target=scale(stats.timers.{{ site }}.search.es.took.count%2C0.1)']],
         ['Authenticated Responses', ['target=stats.{{ site }}.response.auth.200&target=scale(stats.{{ site }}.response.200%2C0.1)&from=-1hours']],
         ['Marketplace', ['target=stats.timers.{{ site }}.paypal.paykey.retrieval.upper_90']],
-        ['Client', ['target=stats.timers.{{ site }}.window.performance.timing.domInteractive.mean&target=stats.timers.{{ site }}.window.performance.timing.domInteractive.upper_90&target=stats.timers.{{ site }}.window.performance.timing.domComplete.mean&target=stats.timers.{{ site }}.window.performance.timing.domComplete.upper_90&target=stats.timers.{{ site }}.window.performance.timing.domLoading.mean&target=stats.timers.{{ site }}.window.performance.timing.domLoading.upper_90']]
+        ['Client', ['target=stats.timers.{{ site }}.window.performance.timing.domInteractive.mean'
+                    '&target=stats.timers.{{ site }}.window.performance.timing.domInteractive.upper_90'
+                    '&target=stats.timers.{{ site }}.window.performance.timing.domComplete.mean'
+                    '&target=stats.timers.{{ site }}.window.performance.timing.domComplete.upper_90'
+                    '&target=stats.timers.{{ site }}.window.performance.timing.domLoading.mean'
+                    '&target=stats.timers.{{ site }}.window.performance.timing.domLoading.upper_90']],
+        ['Client Counts', ['target=stats.{{ site }}.window.performance.navigation.redirectCountstats'
+                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.back_forward'
+                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.navigate'
+                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.reload'
+                    '&target=stats.timers.{{ site }}.window.performance.navigation.type.reserved']]
     )
 
     graphs = []
