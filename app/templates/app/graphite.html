@@ -2,29 +2,32 @@
 <title>AMO Graphite</title>
 <head>
   <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css" />
+  <style type="text/css">
+ul {
+  column-count:2; -moz-column-count:2;
+  column-gap:0em; -moz-column-gap:0em;
+}
+  </style>
 </head>
 <body>
 <div class="container-fluid">
   <h1>AMO: Graphite for {{ site }}</h1>
   <ul>
     {% for site in sites %}
-      <li><a href="?site={{ site }}">{{ site }}</a></li>
+    <li><a href="?site={{ site }}&graph={{ defaults.graph }}">{{ site }}</a></li>
     {% endfor %}
   </ul>
+  <hr/>
   <ul>
     {% for slug, name, graph in graphs %}
-    <li><a href="#{{ slug }}">{{ name }}</a></li>
+    <li><a href="?site={{ defaults.site }}&graph={{ slug }}">{{ name }}</a></li>
     {% endfor %}
   </ul>
-  {% for slug, name, gs in graphs %}
-    {% for g in gs %}
-    <h2><a id="{{ slug }}">{{ name }}</a></h2>
-    <img class="fifteen" src="{{ base }}&{{ g }}&{{ fifteen }}">
-    <img class="hour" src="{{ base }}&{{ g }}&{{ hour }}">
-    <img class="day" src="{{ base }}&{{ g }}&{{ day }}">
-    <img class="week" src="{{ base }}&{{ g }}&{{ week }}">
-    {% endfor %}
-  {% endfor %}
+    <h2><a id="{{ graph.slug }}">{{ graph.name }}</a></h2>
+    <img class="fifteen" src="{{ base }}&{{ graph.url }}&{{ fifteen }}">
+    <img class="hour" src="{{ base }}&{{ graph.url  }}&{{ hour }}">
+    <img class="day" src="{{ base }}&{{ graph.url  }}&{{ day }}">
+    <img class="week" src="{{ base }}&{{ graph.url  }}&{{ week }}">
 </div>
 </body>
 </html>

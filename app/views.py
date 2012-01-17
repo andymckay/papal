@@ -69,6 +69,7 @@ def home(request):
 
 def graphite(request):
     site = request.GET.get('site', 'addons')
+    graph = request.GET.get('graph', 'all-responses')
     site_names = {
         'addons': 'PHX',
         'dev': 'Preview',
@@ -130,12 +131,16 @@ def graphite(request):
                     '&target=stats.{{ site }}.window.performance.navigation.type.reserved']]
     )
 
-    graphs = []
+    graphs = {}
     ctx = Context(data)
     for name, gs in _graphs:
-        graphs.append([name.lower().replace(' ', '-'), name,
-                       [str(Template(g).render(ctx)) for g in gs]])
+        slug = name.lower().replace(' ', '-')
+        graphs[slug] = {
+                'name': name, 'slug': slug,
+                'url': [str(Template(g).render(ctx)) for g in gs] }
 
-    data['graphs'] = graphs
+    data['graphs'] = sorted([ (v['slug'], v['name'], v['url']) for v in graphs.values() ])
+    data['graph'] = graphs[graph]
+    data['defaults'] = {'site': site, 'graph': graph}
     return render_to_response('app/graphite.html', data, mimetype='text/html')
 
