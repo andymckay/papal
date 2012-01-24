@@ -8,11 +8,13 @@
 <body>
   <div class="container-fluid">
     <h1>AMO: Another Dashboard</h1>
-    <ul>
-      <li><a href="{% url graphite %}">Graphite</a></li>
-      <li><a href="{% url paypal %}">Paypal</a></li>
-      <li><a href="http://arecibo1.dmz.phx1.mozilla.com/list/">Arecibo</a></li>
-    </ul>
+      <h2><a href="{% url paypal %}">Paypal</a></h2>
+      <h2><a href="http://arecibo1.dmz.phx1.mozilla.com/list/">Arecibo</a> (<a href="http://arecibo1.dmz.phx1.mozilla.com/list/?priority=&status=&read=&start=&period=&end=&query=&domain=addons.mozilla.org&uid=&group=">prod</a>)</li>
+      <h2><a href="http://panorama.fligtar.khan.mozilla.org/">Panorama</a></h2>
+
+      <h2><a href="{% url graphite %}">Graphite</a>
+      <h3>All responses, last 15 mins on prod:</h3>
+      <img src="https://graphite-phx.mozilla.org/render/?width=586&amp;height=308&[&#39;target=sumSeries(stats.addons.response.*)&amp;target=stats.addons.response.200&amp;target=stats.addons.response.301&amp;target=stats.addons.response.302&amp;target=stats.addons.response.403&amp;target=stats.addons.response.404&amp;target=stats.addons.response.405&amp;target=stats.addons.response.500&#39;]&from=-15minutes&amp;title=15 minutes">
  </div>
 </body>
 </html>

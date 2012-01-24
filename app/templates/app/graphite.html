@@ -10,8 +10,8 @@ ul {
   </style>
 </head>
 <body>
-<div class="container-fluid">
-  <h1>AMO: Graphite for {{ site }}</h1>
+  <div class="container-fluid">
+  <h1><a href="{% url home %}">AMO</a>: Graphite for {{ site }}</h1>
   <ul>
     {% for site in sites %}
     <li><a href="?site={{ site }}&graph={{ defaults.graph }}">{{ site }}</a></li>
