@@ -102,6 +102,8 @@ def graphite(request):
         'hour': 'from=-1hours&title=1 hour',
         'day': 'from=-24hours&title=24 hours',
         'week': 'from=-7days&title=7 days',
+        'month': 'from=-30days&title=30 days',
+        '3month': 'from=-90days&title=90 days',
         'ns': 'stats.%s' % sites[site]
     }
     _graphs = (

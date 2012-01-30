@@ -24,10 +24,12 @@ ul {
     {% endfor %}
   </ul>
     <h2><a id="{{ graph.slug }}">{{ graph.name }}</a></h2>
-    <img class="fifteen" src="{{ base }}&{{ graph.url }}&{{ fifteen }}">
-    <img class="hour" src="{{ base }}&{{ graph.url  }}&{{ hour }}">
-    <img class="day" src="{{ base }}&{{ graph.url  }}&{{ day }}">
-    <img class="week" src="{{ base }}&{{ graph.url  }}&{{ week }}">
+    <img class="fifteen" src="{{ base }}&{{ graph.url.0 }}&{{ fifteen }}">
+    <img class="hour" src="{{ base }}&{{ graph.url.0  }}&{{ hour }}">
+    <img class="day" src="{{ base }}&{{ graph.url.0  }}&{{ day }}">
+    <img class="week" src="{{ base }}&{{ graph.url.0  }}&{{ week }}">
+    <img class="month" src="{{ base }}&{{ graph.url.0  }}&{{ month }}">
+    <img class="3month" src="{{ base }}&{{ graph.url.0  }}&{{ 3month }}">
 </div>
 </body>
 </html>
