@@ -131,10 +131,7 @@ def graphite(request):
                     '&target=stats.{{ site }}.window.performance.navigation.type.navigate'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reload'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reserved']],
-        ['Error Counts', ['target=stats.{{ site }}.error'
-                    '&target=stats.{{ site }}.error.ioerror'
-                    '&target=stats.{{ site }}.error.operationerror'
-                    '&target=stats.{{ site }}.error.timeouterror']]
+        ['Error Counts', ['target=stats.{{ site }}.error.*']]
     )
 
     graphs = {}
