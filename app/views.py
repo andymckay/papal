@@ -130,7 +130,11 @@ def graphite(request):
                     '&target=stats.{{ site }}.window.performance.navigation.type.back_forward'
                     '&target=stats.{{ site }}.window.performance.navigation.type.navigate'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reload'
-                    '&target=stats.{{ site }}.window.performance.navigation.type.reserved']]
+                    '&target=stats.{{ site }}.window.performance.navigation.type.reserved']],
+        ['Error Counts', ['target=stats_counts.{{ site }}.error'
+                    '&target=stats_counts.{{ site }}.error.ioerror'
+                    '&target=stats_counts.{{ site }}.error.operationerror'
+                    '&target=stats_counts.{{ site }}.error.timeouterror']]
     )
 
     graphs = {}
