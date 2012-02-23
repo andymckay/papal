@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.utils.datastructures import SortedDict
 from django.core import serializers
 from django.db.models import Count
 from django.http import HttpResponse
@@ -71,9 +72,11 @@ def graphite(request):
     site = request.GET.get('site', 'addons')
     graph = request.GET.get('graph', 'all-responses')
     site_names = {
-        'addons': 'PHX',
-        'dev': 'Preview',
-        'stage': 'Stage',
+        'addons': 'Addons',
+        'dev': 'Addons Dev',
+        'stage': 'Addons Stage',
+        'marketplace': 'Marketplace',
+        'marketplace-dev': 'Marketplace Dev',
         'apps-preview': 'Apps Preview',
         'apps-preview-dev': 'Apps Preview Dev'
     }
@@ -81,16 +84,20 @@ def graphite(request):
         'addons': 'https://addons.mozilla.org',
         'dev': 'https://addons-dev.allizom.org',
         'stage': 'https://addons.allizom.org',
+        'marketplace': 'https://marketplace.mozilla.org',
+        'marketplace-dev': 'https://marketplace-dev.allizom.org',
         'apps-preview': 'https://apps-preview.mozilla.org',
         'apps-preview-dev': 'https://apps-preview-dev.allizom.org'
     }
-    sites = {
+    sites = SortedDict({
         'addons': 'addons',
         'dev': 'addons-dev',
         'stage': 'addons-stage',
+        'marketplace': 'addons-marketplace',
+        'marketplace-dev': 'addons-marketplacedev',
         'apps-preview': 'addons-appspreview',
         'apps-preview-dev': 'addons-appspreviewdev'
-    }
+    })
     data = {
         'base': 'https://graphite-phx.mozilla.org/render/?width=586&height=308',
         'site_url': site_urls[site],
