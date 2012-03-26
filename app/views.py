@@ -138,7 +138,8 @@ def graphite(request):
                     '&target=stats.{{ site }}.window.performance.navigation.type.navigate'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reload'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reserved']],
-        ['Error Counts', ['target=stats.{{ site }}.error.*']]
+        ['Error Counts', ['target=stats.{{ site }}.error.*']],
+        ['Validator', ['target={{ site }}.celery.tasks.total.devhub.tasks.validator']]
     )
 
     graphs = {}
