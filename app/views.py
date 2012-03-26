@@ -155,3 +155,26 @@ def graphite(request):
     data['defaults'] = {'site': site, 'graph': graph}
     return render_to_response('app/graphite.html', data, mimetype='text/html')
 
+def webapp_manifest(self):
+    response = HttpResponse("""
+{
+ "name": "Steamcube",
+ "description": "A simple 2.5D brain teaser block puzzle game. Find out how far can you get before time runs out?",
+ "launch_path": "/steamcube/index.php",
+ "developer": {
+   "name": "Paul Brunt",
+   "url": "http://www.glge.org"
+ },
+ "icons": {
+       "128":"/webapps/sample-image.png"
+ },
+ "installs_allowed_from": [ "*" ]
+}
+""", content_type = 'application/x-web-app-manifest+json')
+    return response
+
+def webapp_image(self):
+    response = HttpResponse(open('/home/amckay/papal/title.png', 'rb'), content_type='image/png')
+    import time; time.sleep(3);
+    return response 
+
