@@ -143,6 +143,7 @@ def graphite(request):
                        '&target={{ site }}.celery.tasks.failed.devhub.tasks.validator'
                        '&target={{ site }}.celery.tasks.pending.devhub.tasks.validator']]
     )
+    updates = 'target=drawAsInfinite(events.deploy.website)'
 
     graphs = {}
     ctx = Context(data)
@@ -150,7 +151,9 @@ def graphite(request):
         slug = name.lower().replace(' ', '-')
         graphs[slug] = {
                 'name': name, 'slug': slug,
-                'url': [str(Template(g).render(ctx)) for g in gs] }
+                'url': [str(Template(g).render(ctx)) for g in gs],
+                'updates': str(Template().render(ctx))
+        }
 
     data['graphs'] = sorted([ (v['slug'], v['name'], v['url']) for v in graphs.values() ])
     data['graph'] = graphs[graph]
