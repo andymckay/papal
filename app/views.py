@@ -77,8 +77,7 @@ def graphite(request):
         'stage': 'Addons Stage',
         'marketplace': 'Marketplace',
         'marketplace-dev': 'Marketplace Dev',
-        'apps-preview': 'Apps Preview',
-        'apps-preview-dev': 'Apps Preview Dev'
+        'marketplace-stage': 'Marketplace Stage',
     }
     site_urls = {
         'addons': 'https://addons.mozilla.org',
@@ -86,8 +85,7 @@ def graphite(request):
         'stage': 'https://addons.allizom.org',
         'marketplace': 'https://marketplace.mozilla.org',
         'marketplace-dev': 'https://marketplace-dev.allizom.org',
-        'apps-preview': 'https://apps-preview.mozilla.org',
-        'apps-preview-dev': 'https://apps-preview-dev.allizom.org'
+        'marketplace-stage': 'https://marketplace.allizom.org',
     }
     sites = SortedDict({
         'addons': 'addons',
@@ -95,15 +93,16 @@ def graphite(request):
         'stage': 'addons-stage',
         'marketplace': 'addons-marketplace',
         'marketplace-dev': 'addons-marketplacedev',
-        'apps-preview': 'addons-appspreview',
-        'apps-preview-dev': 'addons-appspreviewdev'
+        'marketplace-dev': 'addons-marketplacestage',
     })
+    updates = '&target=drawAsInfinite(stats.timers.{{ site }}.update.count)'
     data = {
         'base': 'https://graphite-phx.mozilla.org/render/?width=586&height=308',
         'site_url': site_urls[site],
         'site_urls': site_urls,
         'site_name': site_names[site],
         'site': sites[site],
+        'show_updates': updates if site in ['addons', 'marketplace'] else '',
         'sites': sites,
         'fifteen': 'from=-15minutes&title=15 minutes',
         'hour': 'from=-1hours&title=1 hour',
@@ -138,13 +137,12 @@ def graphite(request):
                     '&target=stats.{{ site }}.window.performance.navigation.type.navigate'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reload'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reserved']],
-        ['Error Counts', ['target=stats.{{ site }}.error.*']],
+        ['Error Counts', ['target=sumSeries(stats.{{ site }}.error.*)'
+                          '&target=stats.{{ site }}.operationalerror']],
         ['Validator', ['target={{ site }}.celery.tasks.total.devhub.tasks.validator'
                        '&target={{ site }}.celery.tasks.failed.devhub.tasks.validator'
                        '&target={{ site }}.celery.tasks.pending.devhub.tasks.validator']]
     )
-    updates = 'target=drawAsInfinite({{ site }}.update)'
-
     graphs = {}
     ctx = Context(data)
     for name, gs in _graphs:
@@ -152,8 +150,9 @@ def graphite(request):
         graphs[slug] = {
                 'name': name, 'slug': slug,
                 'url': [str(Template(g).render(ctx)) for g in gs],
-                'updates': str(Template(updates).render(ctx))
+                'updates': data['show_updates'],
         }
+
 
     data['graphs'] = sorted([ (v['slug'], v['name'], v['url']) for v in graphs.values() ])
     data['graph'] = graphs[graph]
