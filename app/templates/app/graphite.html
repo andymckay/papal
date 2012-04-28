@@ -2,34 +2,28 @@
 <title>AMO Graphite</title>
 <head>
   <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css" />
-  <style type="text/css">
-ul {
-  column-count:2; -moz-column-count:2;
-  column-gap:0em; -moz-column-gap:0em;
-}
-  </style>
 </head>
 <body>
   <div class="container-fluid">
   <h1><a href="{% url home %}">AMO</a>: Graphite for {{ site }}</h1>
-  <ul>
+  <p>
     {% for site in sites %}
-    <li><a href="?site={{ site }}&graph={{ defaults.graph }}">{{ site }}</a></li>
+      <a href="?site={{ site }}&graph={{ defaults.graph }}">{{ site }}</a> |
     {% endfor %}
-  </ul>
+  </p>
   <hr/>
-  <ul>
+  <p>
     {% for slug, name, graph in graphs %}
-    <li><a href="?site={{ defaults.site }}&graph={{ slug }}">{{ name }}</a></li>
+      <a href="?site={{ defaults.site }}&graph={{ slug }}">{{ name }}</a> |
     {% endfor %}
-  </ul>
+  </p>
     <h2><a id="{{ graph.slug }}">{{ graph.name }}</a></h2>
-    <img class="fifteen" src="{{ base }}&{{ graph.url.0 }}&{{ updates }}&{{ fifteen }}">
-    <img class="hour" src="{{ base }}&{{ graph.url.0  }}&{{ updates }}&{{ hour }}">
-    <img class="day" src="{{ base }}&{{ graph.url.0  }}&{{ updates }}&{{ day }}">
-    <img class="week" src="{{ base }}&{{ graph.url.0  }}&{{ week }}">
-    <img class="month" src="{{ base }}&{{ graph.url.0  }}&{{ month }}">
-    <img class="3month" src="{{ base }}&{{ graph.url.0  }}&{{ 3month }}">
+    <img class="fifteen" src="{{ base }}&{{ graph.url.0 }}{{ graph.updates }}&{{ fifteen }}">
+    <img class="hour" src="{{ base }}&{{ graph.url.0  }}{{ graph.updates }}&{{ hour }}">
+    <img class="day" src="{{ base }}&{{ graph.url.0  }}{{ graph.updates }}&{{ day }}">
+    <img class="week" src="{{ base }}&{{ graph.url.0  }}{{ graph.updates }}&{{ week }}">
+    <img class="month" src="{{ base }}&{{ graph.url.0  }}{{ graph.updates }}&{{ month }}">
+    <img class="3month" src="{{ base }}&{{ graph.url.0  }}{{ graph.updates }}&{{ 3month }}">
 </div>
 </body>
 </html>
