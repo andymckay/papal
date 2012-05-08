@@ -97,7 +97,7 @@ def graphite(request):
         'marketplace-dev': 'addons-marketplacedev',
         'marketplace-stage': 'addons-marketplacestage',
     })
-    updates = '&target=drawAsInfinite(stats.timers.%s.update.count)' % sites[site] 
+    updates = '&target=drawAsInfinite(stats.timers.%s.update.count)' % sites[site]
     data = {
         'base': 'https://graphite-phx.mozilla.org/render/?width=586&height=308',
         'site_url': site_urls[site],
@@ -147,6 +147,9 @@ def graphite(request):
         ['Validator', ['target={{ site }}.celery.tasks.total.devhub.tasks.validator'
                        '&target={{ site }}.celery.tasks.failed.devhub.tasks.validator'
                        '&target={{ site }}.celery.tasks.pending.devhub.tasks.validator']]
+        ['Signing', ['target=stats.timers.{{ site }}.services.sign.upper_90',
+                     '&target=stats.timers.{{ site }}.services.sign.count']],
+
     )
     graphs = {}
     ctx = Context(data)
@@ -184,5 +187,5 @@ def webapp_manifest(self):
 def webapp_image(self):
     response = HttpResponse(open('/home/amckay/papal/title.png', 'rb'), content_type='image/png')
     import time; time.sleep(3);
-    return response 
+    return response
 
