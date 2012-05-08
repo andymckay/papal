@@ -128,7 +128,24 @@ def graphite(request):
         ['Search', ['target=stats.timers.{{ site }}.view.search.views.search.GET.lower&target=stats.timers.{{ site }}.view.search.views.search.GET.mean&target=stats.timers.{{ site }}.view.search.views.search.GET.upper_90&target=scale(stats.timers.{{ site }}.view.search.views.search.GET.count,0.1)']],
         ['ES Request', ['target=stats.timers.{{ site }}.search.es.took.lower&target=stats.timers.{{ site }}.search.es.took.mean&target=stats.timers.{{ site }}.search.es.took.upper_90&target=scale(stats.timers.{{ site }}.search.es.took.count%2C0.1)']],
         ['Authenticated Responses', ['target=stats.{{ site }}.response.auth.200&target=scale(stats.{{ site }}.response.200%2C0.1)&from=-1hours']],
-        ['Marketplace', ['target=stats.timers.{{ site }}.paypal.paykey.retrieval.upper_90']],
+        ['Paypal', ['target=stats.timers.{{ site }}.paypal.paykey.retrieval.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.payment.details.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.payment.refund.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.get.personal.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.permissions.refund.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.permissions.token.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.permissions.url.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.preapproval.token.upper_90'
+                    '&target=stats.timers.{{ site }}.paypal.validate_ipn.upper_90']],
+        ['Paypal Counts', ['target=stats.timers.{{ site }}.paypal.paykey.retrieval.count'
+                    '&target=stats.timers.{{ site }}.paypal.payment.details.count'
+                    '&target=stats.timers.{{ site }}.paypal.payment.refund.count'
+                    '&target=stats.timers.{{ site }}.paypal.get.personal.count'
+                    '&target=stats.timers.{{ site }}.paypal.permissions.refund.count'
+                    '&target=stats.timers.{{ site }}.paypal.permissions.token.count'
+                    '&target=stats.timers.{{ site }}.paypal.permissions.url.count'
+                    '&target=stats.timers.{{ site }}.paypal.preapproval.token.count'
+                    '&target=stats.timers.{{ site }}.paypal.validate_ipn.count']],
         ['Client', ['target=stats.timers.{{ site }}.window.performance.timing.domInteractive.mean'
                     '&target=stats.timers.{{ site }}.window.performance.timing.domInteractive.upper_90'
                     '&target=stats.timers.{{ site }}.window.performance.timing.domComplete.mean'
@@ -146,7 +163,7 @@ def graphite(request):
                           '&target=stats.{{ site }}.error.operationalerror']],
         ['Validator', ['target={{ site }}.celery.tasks.total.devhub.tasks.validator'
                        '&target={{ site }}.celery.tasks.failed.devhub.tasks.validator'
-                       '&target={{ site }}.celery.tasks.pending.devhub.tasks.validator']]
+                       '&target={{ site }}.celery.tasks.pending.devhub.tasks.validator']],
         ['Signing', ['target=stats.timers.{{ site }}.services.sign.upper_90',
                      '&target=stats.timers.{{ site }}.services.sign.count']],
 
