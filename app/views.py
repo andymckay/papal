@@ -95,11 +95,9 @@ def graphite(request):
         'stage': 'addons-stage',
         'marketplace': 'addons-marketplace',
         'marketplace-dev': 'addons-marketplacedev',
-        'marketplace-dev': 'addons-marketplacestage',
+        'marketplace-stage': 'addons-marketplacestage',
     })
-    updates = ''
-    if site in ['addons', 'marketplace']:
-        updates = '&target=drawAsInfinite(stats.timers.%s.update.count)' % sites[site] 
+    updates = '&target=drawAsInfinite(stats.timers.%s.update.count)' % sites[site] 
     data = {
         'base': 'https://graphite-phx.mozilla.org/render/?width=586&height=308',
         'site_url': site_urls[site],
@@ -123,6 +121,7 @@ def graphite(request):
         ['Celery', ['target=sumSeries({{ site }}.celery.tasks.pending.*.*.*)&target=nonNegativeDerivative(sumSeries({{ site }}.celery.tasks.total.*.*.*))&target=nonNegativeDerivative(sumSeries({{ site }}.celery.tasks.failed.*.*.*))']],
         ['Validation', ['target=stats.timers.{{ site }}.devhub.validator.lower&target=stats.timers.{{ site }}.devhub.validator.mean&target=stats.timers.{{ site }}.devhub.validator.upper_90']],
         ['GUID Search', ['target=stats.timers.{{ site }}.view.api.views.guid_search.GET.lower&target=stats.timers.{{ site }}.view.api.views.guid_search.GET.mean&target=stats.timers.{{ site }}.view.api.views.guid_search.GET.upper_90&target=scale(stats.timers.{{ site }}.view.api.views.guid_search.GET.count(0.01)']],
+        ['GUI Search Counts', ['target=scale(stats.timers.{{ site }}.view.api.views.guid_search.GET.count,0.1)']],
         ['Update', ['target=stats.timers.{{ site }}.services.update.lower&target=stats.timers.{{ site }}.services.update.mean&target=stats.timers.{{ site }}.services.update.upper_90&target=scale(stats.timers.{{ site }}.services.update.count(0.01)']],
         ['Verify', ['target=stats.timers.{{ site }}.services.verify.lower&target=stats.timers.{{ site }}.services.verify.mean&target=stats.timers.{{ site }}.services.verify.upper_90&target=scale(stats.timers.{{ site }}.services.verify.count(0.01)']],
         ['Homepage', ['target=stats.timers.{{ site }}.view.addons.views.home.GET.lower&target=stats.timers.{{ site }}.view.addons.views.home.GET.mean&target=stats.timers.{{ site }}.view.addons.views.home.GET.upper_90&target=scale(stats.timers.{{ site }}.view.addons.views.home.GET.count,0.1)']],
@@ -141,6 +140,8 @@ def graphite(request):
                     '&target=stats.{{ site }}.window.performance.navigation.type.navigate'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reload'
                     '&target=stats.{{ site }}.window.performance.navigation.type.reserved']],
+        ['Client Fragment', ['target=stats.timers.{{ site }}.window.performance.timing.fragment.loaded.upper_90',
+                    '&target=stats.timers.{{ site }}.window.performance.timing.fragment.loaded.mean']],
         ['Error Counts', ['target=sumSeries(stats.{{ site }}.error.*)'
                           '&target=stats.{{ site }}.error.operationalerror']],
         ['Validator', ['target={{ site }}.celery.tasks.total.devhub.tasks.validator'
