@@ -146,7 +146,7 @@ def graphite(request):
                           '&target=stats.{{ site }}.error.operationalerror']],
         ['Validator', ['target={{ site }}.celery.tasks.total.devhub.tasks.validator'
                        '&target={{ site }}.celery.tasks.failed.devhub.tasks.validator'
-                       '&target={{ site }}.celery.tasks.pending.devhub.tasks.validator']]
+                       '&target={{ site }}.celery.tasks.pending.devhub.tasks.validator']],
         ['Signing', ['target=stats.timers.{{ site }}.services.sign.upper_90',
                      '&target=stats.timers.{{ site }}.services.sign.count']],
 
@@ -189,3 +189,11 @@ def webapp_image(self):
     import time; time.sleep(3);
     return response
 
+
+def ganglia(request):
+    data = {}
+    data['period'] = request.GET.get('period', 'hour')
+    data['size'] = request.GET.get('size', 'medium')
+    data['ganglia_base'] = settings.GANGLIA_BASE
+
+    return render_to_response('app/ganglia.html', data, mimetype='text/html')
