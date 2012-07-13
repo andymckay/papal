@@ -159,6 +159,10 @@ def graphite(request):
                     '&target=stats.{{ site }}.window.performance.navigation.type.reserved']],
         ['Client Fragment', ['target=stats.timers.{{ site }}.window.performance.timing.fragment.loaded.upper_90',
                     '&target=stats.timers.{{ site }}.window.performance.timing.fragment.loaded.mean']],
+        ['Client Calculated', ['target=stats.timers.{{ site }}.window.performance.calculated.app.mean',
+                    '&target=stats.timers.{{ site }}.window.performance.calculated.dom.mean',
+                    '&target=stats.timers.{{ site }}.window.performance.calculated.network.mean',
+                    '&target=stats.timers.{{ site }}.window.performance.calculated.rendering.mean']],
         ['Error Counts', ['target=sumSeries(stats.{{ site }}.error.*)'
                           '&target=stats.{{ site }}.error.operationalerror']],
         ['Validator', ['target={{ site }}.celery.tasks.total.devhub.tasks.validator'
