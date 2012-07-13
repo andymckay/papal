@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+    <title>AMO Ganglia</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Ganglia Graphs</h1>
+    <form id="graph_switcher">
+        Period: <select name="period">
+            <option value="hour">hour</option>
+            <option value="day">day</option>
+            <option value="week">week</option>
+            <option value="month">month</option>
+            <option value="year">year</option>
+        </select>
+        Size: <select name="size">
+            <option value="small">small</option>
+            <option value="medium">medium</option>
+            <option value="large">large</option>
+            <option value="xlarge">xlarge</option>
+        </select>
+        <input type="submit" value="Switch" />
+    </form>
+    <div id="graphs" class="container-fluid">
+
+    </div>
+    <script>
+        var GANGLIA_BASE = '{{ ganglia_base }}';
+        var graphs = {
+            'Web': {reports: ['load_report',
+                              'cpu_report',
+                              'mem_report',
+                              'network_report',
+                              'apache_report',
+                              'apache_server_report'],
+                    cluster: 'addons'},
+            'Memcache': {reports: ['load_report',
+                                   'cpu_report',
+                                   'mem_report',
+                                   'network_report',
+                                   'memcached_report'],
+                         cluster: 'Memcache AMO Cluster'},
+            'Redis': {reports: ['load_report',
+                                'cpu_report',
+                                'mem_report',
+                                'network_report',
+                                'amo_redis_prod_report'],
+                      cluster: 'amo-redis'}
+        };
+
+        function graph_url(name, cluster, size, period, type, host) {
+            var query = {c: cluster, 
+                         z: size != null ? size : 'medium',
+                         r: period != null ? period : 'hour'};
+            if (type == null) {
+                 query['g'] = name;
+            } else  {
+                query[type] = name;
+            }
+            if (host != null) {
+                query['h'] = host;
+            }
+            return GANGLIA_BASE + "/graph.php?" + $.param(query);
+        }
+
+        function display_graphs() {
+            var size = $('select[name=size]').val();
+            var period = $('select[name=period]').val();
+            $('#graphs').empty(); 
+            for(var title in graphs) {
+                var cur = graphs[title];
+                $('<h2/>', {text: title}).appendTo('#graphs');
+                $.each(cur.reports, function(i, graph) {
+                    $('<img />', {src: graph_url(graph, cur.cluster, size, period)}).appendTo('#graphs');    
+                });
+            }
+        }
+
+        $().ready(function() {
+            $('select[name=size]').val('{{ size }}');
+            $('select[name=period]').val('{{ period }}');
+            $('#graph_switcher').submit(function() {
+                window.history.replaceState({}, "", "?" + $(this).serialize());
+                display_graphs();
+                return false;
+            });
+            display_graphs();
+        });
+    </script>
+</body>
+</html>
